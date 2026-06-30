@@ -1,291 +1,186 @@
-# Processador MIPS Monociclo Simplificado – Equipe B
+# Requisitos
 
-**Disciplina:** Arquitetura de Computadores  
-**Trabalho Prático:** Implementação de um Processador MIPS Monociclo Simplificado em Verilog HDL  
-**Equipe:** B – Imediatos e Jump
-
----
-
-# Objetivo
-
-Este projeto implementa um **processador MIPS monociclo simplificado** em **Verilog HDL**, baseado na arquitetura apresentada por Patterson & Hennessy.
-
-A implementação contempla o caminho de dados (Datapath), Unidade de Controle, Banco de Registradores, ALU, Memória de Instruções e os demais módulos necessários para executar um subconjunto das instruções MIPS.
-
-O projeto foi desenvolvido para ser compatível com:
+Antes de executar o projeto é necessário instalar:
 
 - Icarus Verilog
 - GTKWave
-- Simulação em ambiente Windows ou Linux
 
 ---
 
-# Instruções implementadas
+# Instalação
 
-## Tipo R
+## Windows
 
-| Instrução | Função |
-|-----------|---------|
-| add | Soma |
-| sub | Subtração |
-| and | AND lógico |
-| or | OR lógico |
-| slt | Set Less Than |
+### 1. Instalar o Icarus Verilog
 
-## Tipo I
+Faça o download do instalador em:
 
-| Instrução | Função |
-|-----------|---------|
-| addi | Soma com imediato (extensão de sinal) |
-| andi | AND com imediato (extensão com zeros) |
-| ori | OR com imediato (extensão com zeros) |
+https://bleyer.org/icarus/
 
-## Tipo J
+ou
 
-| Instrução | Função |
-|-----------|---------|
-| j | Jump |
+https://github.com/steveicarus/iverilog/releases
 
----
+Durante a instalação, habilite a opção para adicionar o Icarus Verilog ao **PATH** do Windows.
 
-# Arquitetura
+Após a instalação, abra o Prompt de Comando e execute:
 
-O projeto foi organizado em módulos independentes.
-
+```bash
+iverilog -V
 ```
-                +-------------------+
-                |        PC         |
-                +---------+---------+
-                          |
-                          v
-              +-----------------------+
-              | Instruction Memory    |
-              +-----------+-----------+
-                          |
-                          v
-              +-----------------------+
-              |    Control Unit       |
-              +-----------+-----------+
-                          |
-                          |
-        +-----------------+------------------+
-        |                                    |
-        v                                    v
-+---------------+                 +------------------+
-| Register File |                 | Sign/Zero Extend |
-+-------+-------+                 +--------+---------+
-        |                                  |
-        +------------+   +------------------+
-                     |   |
-                     v   v
-                    +-----+
-                    | ALU |
-                    +--+--+
-                       |
-                       v
-                 Write Back
+
+Se a instalação estiver correta, será exibida a versão instalada.
+
+### 2. Instalar o GTKWave
+
+Download:
+
+https://gtkwave.sourceforge.net/
+
+Após instalar, o comando abaixo deverá funcionar:
+
+```bash
+gtkwave
 ```
 
 ---
 
-# Estrutura do projeto
+## Linux (Ubuntu/Debian)
 
-```
-cpu.v
-alu.v
-alu_control.v
-control_unit.v
-instruction_memory.v
-register_file.v
-sign_extend.v
-zero_extend.v
-pc.v
-mux.v
-testbench.v
-program.mem
-README.md
+Atualize os repositórios:
+
+```bash
+sudo apt update
 ```
 
----
+Instale o Icarus Verilog:
 
-# Descrição dos módulos
+```bash
+sudo apt install iverilog
+```
 
-## cpu.v
+Instale o GTKWave:
 
-Módulo principal do processador.
+```bash
+sudo apt install gtkwave
+```
 
-Responsável por integrar todos os demais módulos e realizar a execução das instruções.
+Verifique a instalação:
 
----
-
-## pc.v
-
-Implementa o Program Counter.
-
-Funções:
-
-- armazenar o endereço atual
-- incrementar o PC
-- atualizar o endereço após Jump
-
----
-
-## instruction_memory.v
-
-Memória somente leitura.
-
-Carrega o programa através de:
-
-```verilog
-$readmemh("program.mem", memory);
+```bash
+iverilog -V
 ```
 
 ---
 
-## control_unit.v
+## Fedora
 
-Decodifica o opcode e gera os sinais de controle.
-
-Sinais gerados:
-
-- RegDst
-- ALUSrc
-- RegWrite
-- Jump
-- ZeroExt
-- ALUOp
-
----
-
-## alu_control.v
-
-Traduz o sinal ALUOp e o campo funct nas operações da ALU.
-
-Operações suportadas:
-
-- ADD
-- SUB
-- AND
-- OR
-- SLT
-
----
-
-## alu.v
-
-Executa as operações aritméticas e lógicas.
-
-Também gera o sinal:
-
-```
-Zero
+```bash
+sudo dnf install iverilog
+sudo dnf install gtkwave
 ```
 
 ---
 
-## register_file.v
+## Arch Linux
 
-Banco de registradores contendo:
-
-- 32 registradores
-- 32 bits
-- duas portas de leitura
-- uma porta de escrita
-
-O registrador:
-
-```
-$zero
-```
-
-permanece sempre igual a zero.
-
-Também disponibiliza sinais de debug:
-
-```
-R0
-R1
-...
-R7
+```bash
+sudo pacman -S iverilog
+sudo pacman -S gtkwave
 ```
 
 ---
 
-## sign_extend.v
+# Como executar
 
-Realiza extensão de sinal para:
+## Windows
+
+Abra o Prompt de Comando na pasta do projeto.
+
+Compile todos os arquivos:
+
+```bash
+iverilog -o cpu.out *.v
+```
+
+Execute a simulação:
+
+```bash
+vvp cpu.out
+```
+
+Será criado o arquivo:
 
 ```
-addi
+cpu.vcd
+```
+
+Abra o GTKWave:
+
+```bash
+gtkwave cpu.vcd
+```
+
+ou abra o GTKWave manualmente e selecione o arquivo **cpu.vcd**.
+
+---
+
+## Linux
+
+Entre na pasta do projeto:
+
+```bash
+cd nome_da_pasta
+```
+
+Compile:
+
+```bash
+iverilog -g2012 -o cpu.out *.v
+```
+
+Execute:
+
+```bash
+vvp cpu.out
+```
+
+Será criado:
+
+```
+cpu.vcd
+```
+
+Abra no GTKWave:
+
+```bash
+gtkwave cpu.vcd
 ```
 
 ---
 
-## zero_extend.v
+# Saída esperada
 
-Realiza extensão com zeros para:
+Durante a execução, o terminal exibirá informações semelhantes às seguintes:
 
-```
-andi
-ori
-```
+```text
+------------------------------------------------
+PC      : 00000000
+Instr   : 2001000A
 
----
+R0=0 R1=10 R2=0 R3=0
+R4=0 R5=0 R6=0 R7=0
 
-## mux.v
+ALU=10
 
-Multiplexador parametrizado.
-
-É utilizado para:
-
-- RegDst
-- ALUSrc
-- Jump
-
----
-
-## testbench.v
-
-Responsável por:
-
-- gerar clock
-- gerar reset
-- criar arquivo VCD
-- imprimir o estado da CPU
-- finalizar a simulação
-
----
-
-# Programa de teste
-
-O arquivo:
-
-```
-program.mem
+RegWrite=1 ALUSrc=1 Jump=0
+------------------------------------------------
 ```
 
-contém o seguinte programa:
-
-```assembly
-addi $1,$0,10
-addi $2,$0,20
-add  $3,$1,$2
-andi $4,$3,15
-ori  $5,$4,16
-j alvo
-addi $6,$0,99
-alvo:
-slt $7,$1,$2
-```
-
----
-
-# Resultado esperado
-
-Ao término da execução:
+Ao final da execução, os registradores deverão possuir os seguintes valores:
 
 | Registrador | Valor |
-|--------------|-------|
+|-------------|------:|
 | R0 | 0 |
 | R1 | 10 |
 | R2 | 20 |
@@ -297,108 +192,30 @@ Ao término da execução:
 
 ---
 
-# Compilação
-
-## Windows
-
-```bash
-iverilog -o cpu.out *.v
-```
-
-## Linux
-
-```bash
-iverilog -g2012 -o cpu.out *.v
-```
-
----
-
-# Execução
-
-```bash
-vvp cpu.out
-```
-
----
-
-# Visualização das formas de onda
-
-Após executar a simulação será criado:
+# Estrutura esperada da pasta
 
 ```
-cpu.vcd
+Projeto/
+
+├── cpu.v
+├── alu.v
+├── alu_control.v
+├── control_unit.v
+├── instruction_memory.v
+├── register_file.v
+├── sign_extend.v
+├── zero_extend.v
+├── pc.v
+├── mux.v
+├── testbench.v
+├── program.mem
+└── README.md
 ```
 
-Abrir no GTKWave:
+Todos os arquivos devem permanecer na mesma pasta para que o comando:
 
-```bash
-gtkwave cpu.vcd
+```verilog
+$readmemh("program.mem", memory);
 ```
 
----
-
-# Sinais disponíveis
-
-Os principais sinais observáveis durante a simulação são:
-
-- clk
-- reset
-- pc
-- instruction
-- opcode
-- funct
-- ALUControl
-- alu_result
-- Zero
-- RegWrite
-- ALUSrc
-- Jump
-- R0
-- R1
-- R2
-- R3
-- R4
-- R5
-- R6
-- R7
-
----
-
-# Fluxo de execução
-
-1. O PC fornece o endereço da instrução.
-2. A memória de instruções retorna a instrução correspondente.
-3. A Unidade de Controle gera os sinais de controle.
-4. O Banco de Registradores lê os operandos.
-5. O imediato é estendido quando necessário.
-6. A ALU executa a operação.
-7. O resultado é escrito no banco de registradores.
-8. O PC é atualizado para a próxima instrução ou para o endereço de Jump.
-
----
-
-# Requisitos atendidos
-
-- ✔ PC modular
-- ✔ Banco de registradores com 32 registradores
-- ✔ Registrador `$zero`
-- ✔ Memória de instruções
-- ✔ ALU
-- ✔ Unidade de Controle
-- ✔ ALU Control
-- ✔ Extensão de sinal
-- ✔ Extensão com zeros
-- ✔ Jump
-- ✔ Testbench
-- ✔ Arquivo VCD
-- ✔ Compatível com Icarus Verilog
-- ✔ Compatível com GTKWave
-
----
-
-# Referências
-
-- Patterson, David A.; Hennessy, John L. **Computer Organization and Design: The Hardware/Software Interface**.
-- Arquitetura MIPS32.
-- Icarus Verilog.
-- GTKWave.
+consiga localizar corretamente o programa de teste.
